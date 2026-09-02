@@ -15,12 +15,14 @@ copy-genius/                              (repo GitHub: copynerdai/copy-genius-c
         ├── .claude-plugin/
         │   └── plugin.json               ← manifest del plugin (name + version)
         ├── commands/
-        │   └── copy-genius.md            ← il comando /copy-genius (logica install + update)
+        │   ├── copy-genius.md            ← il comando /copy-genius (logica install + update)
+        │   └── ad-scraping.md            ← il comando /ad-scraping (punta alla skill nel vault)
         └── framework/                    ← IL SISTEMA che viene spedito e aggiornato
             ├── VERSION                   ← la versione (es. 1.0.0)
             ├── CLAUDE.md
             ├── index.md
             ├── core/  skills/  format-specialists/  section-specialists/
+            │   └── skills/ad-scraping/   ← tool + modello dati + setup della skill di monitoraggio
             ├── brands/_template/         ← solo il template (nessun brand reale)
             └── swipe/                     ← scaffold vuoto
 ```
