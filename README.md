@@ -52,7 +52,7 @@ Puoi lanciarlo su un brand (`/ad-scraping nomebrand`) o su tutti quelli che hai 
 
 **Prima volta**: servono Node e Playwright, e per trascrivere i video anche ffmpeg + Whisper. Claude te li installa seguendo `skills/ad-scraping/setup.md`. La trascrizione è facoltativa: se salti quel pezzo, schede e report funzionano lo stesso.
 
-L'archivio finisce in `~/Desktop/copy-genius/monitoraggio/` ed è roba tua: gli aggiornamenti non lo toccano.
+L'archivio finisce in `monitoraggio/` dentro la cartella del vault (quella scelta al primo avvio) ed è roba tua: gli aggiornamenti non lo toccano.
 
 > Da un monitoraggio si prendono **angoli, strutture e formati** — mai le frasi. È lo stesso firewall dello swipe file: la struttura attraversa le lingue, il fraseggio no.
 

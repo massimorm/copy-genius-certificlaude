@@ -6,13 +6,18 @@ Attiva la skill **ad-scraping** di Copy Genius: monitoraggio settimanale delle a
 
 ## Dove sta la skill
 
-Il vault Copy Genius è in `~/Desktop/copy-genius/` (se l'utente l'ha installato altrove, chiediglielo). La skill è:
+Il percorso del vault **non è fisso**: è quello scelto dallo studente al primo `/copy-genius`, salvato nel marker:
 
-- Orchestratore: `skills/ad-scraping.md` — **leggilo e segui la sua pipeline**
-- Tool: `skills/ad-scraping/tools/` — i comandi si lanciano da `skills/ad-scraping/`
-- Archivio dati: `monitoraggio/` nella radice del vault (lo trovano da soli i tool)
+- macOS/Linux: `$HOME/.copy-genius/vault-path.txt`
+- Windows: `%USERPROFILE%\.copy-genius\vault-path.txt`
 
-Se il vault non esiste ancora, l'utente deve prima lanciare `/copy-genius` una volta per installarlo.
+Leggi quel file per trovare il vault — **non assumere `~/Desktop/copy-genius/`**. Se il marker non esiste (o il vault al suo interno non ha `CLAUDE.md`), il vault non è ancora installato: di' all'utente di lanciare prima `/copy-genius` una volta, poi riprova.
+
+Una volta risolto il percorso del vault (`VAULT`), la skill è:
+
+- Orchestratore: `VAULT/skills/ad-scraping.md` — **leggilo e segui la sua pipeline**
+- Tool: `VAULT/skills/ad-scraping/tools/` — i comandi si lanciano da lì
+- Archivio dati: `VAULT/monitoraggio/` (lo trovano da soli i tool)
 
 ## Cosa fare con $ARGUMENTS
 
