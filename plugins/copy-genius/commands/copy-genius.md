@@ -5,16 +5,19 @@ allowed-tools: [Bash, Read, Write, Edit, Glob, Grep]
 
 # Copy Genius — launcher (install · update · run)
 
-You are launching a Copy Genius session. This command is self-installing and self-updating, **cross-platform (macOS / Linux / Windows)**. Run the three phases below **in order**, then hand off to the orchestrator.
+You are launching a Copy Genius session. This command is self-installing and self-updating, **cross-platform (macOS / Linux / Windows)**. Run the phases below **in order**, then hand off to the orchestrator.
 
 ## Key locations
 
 - **Framework source (read-only, lives in the plugin)**: `${CLAUDE_PLUGIN_ROOT}/framework/`
-- **Working vault (the student's, lives on their machine)**: the `copy-genius` folder on their Desktop.
+- **Working vault (the student's, lives on their machine)**: a folder **the student chooses**, resolved in Phase 1 below. Suggested default if they don't have a preference:
   - macOS/Linux: `$HOME/Desktop/copy-genius`
   - Windows: `%USERPROFILE%\Desktop\copy-genius`
+- **Vault-path marker (remembers the student's choice across runs)**:
+  - macOS/Linux: `$HOME/.copy-genius/vault-path.txt`
+  - Windows: `%USERPROFILE%\.copy-genius\vault-path.txt`
 
-The framework is what the author ships and updates. The vault is where the student works — their brands, swipe, notebook, and feedback accumulate there and must **never** be overwritten by an update.
+The framework is what the author ships and updates. The vault is where the student works — their brands, swipe, notebook, and feedback accumulate there and must **never** be overwritten by an update, and its location must **never** be silently reassigned once chosen.
 
 ## The invariant (read this — it governs everything below)
 
@@ -30,15 +33,76 @@ Two files inside those paths are framework rules that must reach an already-inst
 
 ---
 
-## Phase 1 — Install or update the vault
+## Phase 1 — Determine the vault path (ask once, remember forever)
 
-**First, detect the operating system.** Then run the matching block below — run ONE block, not both. Both implement the exact same whitelist logic; they differ only in shell. Both are idempotent: first run installs (framework + empty user scaffolds); later runs refresh only the framework and leave all user data untouched; same version = no-op.
+**First, detect the operating system.** Then run the matching block below to check whether the vault path is already known — **do not ask the user anything yet.**
+
+### macOS / Linux (and Git Bash on Windows) — POSIX shell
+
+```bash
+MARKER="$HOME/.copy-genius/vault-path.txt"
+DEFAULT_VAULT="$HOME/Desktop/copy-genius"
+
+if [ -f "$MARKER" ] && [ -s "$MARKER" ]; then
+  echo "COPYGENIUS_VAULT=$(cat "$MARKER")"
+elif [ -f "$DEFAULT_VAULT/CLAUDE.md" ]; then
+  # Pre-existing install from before this feature — adopt it silently, don't re-ask.
+  mkdir -p "$(dirname "$MARKER")"
+  printf '%s' "$DEFAULT_VAULT" > "$MARKER"
+  echo "COPYGENIUS_VAULT=$DEFAULT_VAULT"
+else
+  echo "COPYGENIUS_VAULT_UNSET default=$DEFAULT_VAULT"
+fi
+```
+
+### Windows (native PowerShell)
+
+```powershell
+$Marker = "$env:USERPROFILE\.copy-genius\vault-path.txt"
+$DefaultVault = "$env:USERPROFILE\Desktop\copy-genius"
+
+if ((Test-Path $Marker) -and ((Get-Content $Marker -Raw).Trim().Length -gt 0)) {
+  "COPYGENIUS_VAULT=$((Get-Content $Marker -Raw).Trim())"
+} elseif (Test-Path "$DefaultVault\CLAUDE.md") {
+  New-Item -ItemType Directory -Force -Path (Split-Path $Marker) | Out-Null
+  Set-Content -Path $Marker -Value $DefaultVault -NoNewline
+  "COPYGENIUS_VAULT=$DefaultVault"
+} else {
+  "COPYGENIUS_VAULT_UNSET default=$DefaultVault"
+}
+```
+
+**Read the result:**
+
+- `COPYGENIUS_VAULT=<path>` → the vault path is already known (either from a previous run, or adopted from an existing pre-feature install). **Do not ask anything.** Use `<path>` as `VAULT` and go straight to Phase 2.
+- `COPYGENIUS_VAULT_UNSET default=<path>` → this is a genuinely first-ever install on this machine. **Ask the student**, in chat, where they want the Copy Genius vault installed. Mention the suggested default (`<path>` from the output, translated to the right OS syntax) and that they can press enter / just confirm to accept it, or type a different folder. **Wait for their answer before continuing** — do not proceed with a default silently.
+  - Resolve whatever they answer to an absolute path (expand `~` or `%USERPROFILE%`; if they gave a relative path, resolve it against their home directory). If they gave no answer / confirmed, use the suggested default.
+  - Save the resolved path so this question is **never asked again**:
+
+    macOS/Linux:
+    ```bash
+    VAULT="<resolved absolute path>"
+    mkdir -p "$(dirname "$HOME/.copy-genius/vault-path.txt")"
+    printf '%s' "$VAULT" > "$HOME/.copy-genius/vault-path.txt"
+    ```
+
+    Windows:
+    ```powershell
+    $Vault = "<resolved absolute path>"
+    New-Item -ItemType Directory -Force -Path (Split-Path "$env:USERPROFILE\.copy-genius\vault-path.txt") | Out-Null
+    Set-Content -Path "$env:USERPROFILE\.copy-genius\vault-path.txt" -Value $Vault -NoNewline
+    ```
+  - Use that same resolved path as `VAULT` for Phase 2.
+
+## Phase 2 — Install or update the vault
+
+Both blocks implement the exact same whitelist logic; they differ only in shell. Both are idempotent: first run installs (framework + empty user scaffolds); later runs refresh only the framework and leave all user data untouched; same version = no-op. Both read `VAULT` fresh from the marker file, so they work regardless of how Phase 1 resolved it.
 
 ### macOS / Linux (and Git Bash on Windows) — POSIX shell
 
 ```bash
 SRC="${CLAUDE_PLUGIN_ROOT}/framework"
-VAULT="$HOME/Desktop/copy-genius"
+VAULT="$(cat "$HOME/.copy-genius/vault-path.txt")"
 
 copy_framework() {
   mkdir -p "$VAULT/core/strategic-frameworks" "$VAULT/core/writing" "$VAULT/skills" \
@@ -83,7 +147,7 @@ fi
 
 ```powershell
 $SRC   = "$env:CLAUDE_PLUGIN_ROOT\framework"
-$VAULT = "$env:USERPROFILE\Desktop\copy-genius"
+$VAULT = (Get-Content "$env:USERPROFILE\.copy-genius\vault-path.txt" -Raw).Trim()
 
 function Copy-Framework {
   New-Item -ItemType Directory -Force -Path "$VAULT\core\strategic-frameworks","$VAULT\core\writing","$VAULT\skills","$VAULT\format-specialists","$VAULT\section-specialists","$VAULT\brands\_template" | Out-Null
@@ -120,20 +184,20 @@ if (-not (Test-Path "$VAULT\CLAUDE.md")) {
 }
 ```
 
-**If neither block fits the environment** (unknown shell): apply the invariant by hand — copy ONLY the FRAMEWORK paths listed above from `${CLAUDE_PLUGIN_ROOT}/framework/` into the vault; on a first run also copy the USER-DATA scaffolds; on an update never write to a USER-DATA path that already exists. Compare the two `VERSION` files to decide install vs update vs no-op.
+**If neither block fits the environment** (unknown shell): apply the invariant by hand — copy ONLY the FRAMEWORK paths listed above from `${CLAUDE_PLUGIN_ROOT}/framework/` into the vault at the path recorded in the marker file; on a first run also copy the USER-DATA scaffolds; on an update never write to a USER-DATA path that already exists. Compare the two `VERSION` files to decide install vs update vs no-op.
 
-## Phase 2 — Report the result (one line, in the user's language)
+## Phase 3 — Report the result (one line, in the user's language)
 
 Read the `COPYGENIUS_RESULT=` line:
 
-- `INSTALLED` → "Copy Genius installato in `~/Desktop/copy-genius/`. Pronto."
+- `INSTALLED` → "Copy Genius installato in `<VAULT>`. Pronto." (use the actual resolved vault path, not a hardcoded one)
 - `UPDATED from=X to=Y` → "Copy Genius aggiornato (X → Y). I tuoi brand, swipe, note e feedback sono intatti."
 - `UPTODATE` → say nothing about it; just proceed.
 
 Keep it to one line. Do not dump the file list.
 
-## Phase 3 — Start the session
+## Phase 4 — Start the session
 
-Now read `~/Desktop/copy-genius/CLAUDE.md` (the vault copy, **not** the plugin copy). It is your operating manual for the entire session — identity, architecture, routing, language, and session behavior all live there. Read it ONCE now, then follow it exactly, including its session-open flow (§11). Do not re-read it later in the session.
+Now read `<VAULT>/CLAUDE.md` (the vault copy, at the path resolved in Phase 1 — **not** the plugin copy, and **not** necessarily `~/Desktop/copy-genius`). It is your operating manual for the entire session — identity, architecture, routing, language, and session behavior all live there. Read it ONCE now, then follow it exactly, including its session-open flow (§11). Do not re-read it later in the session.
 
-From this point on you ARE Copy Genius, operating out of the vault at `~/Desktop/copy-genius/`. All reads and writes during the session target the vault, never the plugin framework source.
+From this point on you ARE Copy Genius, operating out of the vault at `<VAULT>`. All reads and writes during the session target the vault, never the plugin framework source.

@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "copy-genius",
-      "description": "Copy Genius — assistente di copywriting direct-response. Si installa da solo in ~/Desktop/copy-genius e si aggiorna conservando brand, swipe, note e feedback.",
+      "description": "Copy Genius — assistente di copywriting direct-response. Si installa da solo (chiedendoti dove, la prima volta) e si aggiorna conservando brand, swipe, note e feedback.",
       "author": {
         "name": "copynerdai"
       },

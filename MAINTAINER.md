@@ -27,9 +27,18 @@ copy-genius/                              (repo GitHub: copynerdai/copy-genius-c
             └── swipe/                     ← scaffold vuoto
 ```
 
-I comandi in `commands/` sono registrati da Claude Code appena il plugin è installato: `/ad-scraping` funziona senza che lo studente copi niente a mano.
+La cartella `framework/` è ciò che finisce nel vault dello studente al primo `/copy-genius`. Tutto il resto (manifest, comando, README) serve all'infrastruttura del plugin.
 
-La cartella `framework/` è ciò che finisce sul Desktop dello studente al primo `/copy-genius`. Tutto il resto (manifest, comando, README) serve all'infrastruttura del plugin.
+## Dove finisce il vault (percorso scelto dallo studente)
+
+Dalla 1.1.0 il comando **non installa più a un percorso fisso**. La prima volta in assoluto che uno studente lancia `/copy-genius` su una macchina, il comando (Fase 1 di `commands/copy-genius.md`) gli chiede dove vuole il vault — suggerendo come default `~/Desktop/copy-genius` (`%USERPROFILE%\Desktop\copy-genius` su Windows) — e salva la risposta in un file marker:
+
+- macOS/Linux: `~/.copy-genius/vault-path.txt`
+- Windows: `%USERPROFILE%\.copy-genius\vault-path.txt`
+
+Alle esecuzioni successive legge il marker e **non chiede più nulla**: installa/aggiorna sempre allo stesso percorso. Per uno studente che aveva già installato prima della 1.1.0 (vault già presente al vecchio percorso di default), il comando adotta silenziosamente quel percorso nel marker, senza fargli domande — nessuna migrazione manuale richiesta.
+
+⚠️ Se modifichi la logica di Fase 1 in `commands/copy-genius.md`, mantieni questo comportamento: chiedere **solo** quando non esiste né un marker né un vault al percorso di default.
 
 ## Il principio chiave: framework vs dati utente
 

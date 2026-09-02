@@ -26,11 +26,11 @@ Poi **riavvia Claude Code** (chiudi e riapri) e digita:
 /copy-genius
 ```
 
-Al primo avvio, Copy Genius si installa da solo in `~/Desktop/copy-genius/` e ti saluta. Da lì, ti guida nella creazione del tuo primo brand.
+Al primo avvio, Copy Genius ti chiede **dove vuoi installare il vault** (la cartella dove vivranno i tuoi brand, swipe e note) — premi invio per usare il default proposto (`~/Desktop/copy-genius/`), oppure indica un altro percorso. La scelta viene ricordata: alle esecuzioni successive non te lo chiede più, installa e aggiorna sempre nello stesso posto.
 
-Fatto. Nessun file da spostare a mano, nessun percorso da configurare.
+Fatto. Nessun file da spostare a mano.
 
-> **Obsidian (opzionale)**: per navigare il vault visivamente, apri `~/Desktop/copy-genius/` come vault in [Obsidian](https://obsidian.md) ("Apri cartella come vault"). Parti da `index.md`.
+> **Obsidian (opzionale)**: per navigare il vault visivamente, apri la cartella del vault (quella che hai scelto o confermato al primo avvio) come vault in [Obsidian](https://obsidian.md) ("Apri cartella come vault"). Parti da `index.md`.
 
 ---
 
@@ -56,7 +56,7 @@ L'archivio finisce in `~/Desktop/copy-genius/monitoraggio/` ed è roba tua: gli 
 
 > Da un monitoraggio si prendono **angoli, strutture e formati** — mai le frasi. È lo stesso firewall dello swipe file: la struttura attraversa le lingue, il fraseggio no.
 
-Tutto il tuo lavoro — brand, swipe, note, feedback — vive in `~/Desktop/copy-genius/` **sul tuo computer**. Resta privato e locale: non viene mai caricato da nessuna parte.
+Tutto il tuo lavoro — brand, swipe, note, feedback — vive nella cartella del vault (quella scelta al primo avvio) **sul tuo computer**. Resta privato e locale: non viene mai caricato da nessuna parte.
 
 ---
 
@@ -74,7 +74,7 @@ Al `/copy-genius` successivo, Copy Genius rinfresca il framework e **lascia inta
 
 ## Cosa NON viene mai toccato da un aggiornamento
 
-Il tuo lavoro. In dettaglio, queste cartelle/file dentro `~/Desktop/copy-genius/` sono tuoi e protetti:
+Il tuo lavoro. In dettaglio, queste cartelle/file dentro la cartella del vault sono tuoi e protetti:
 
 | Protetto (tuo) | Aggiornato (framework) |
 |---|---|
@@ -90,12 +90,13 @@ Il tuo lavoro. In dettaglio, queste cartelle/file dentro `~/Desktop/copy-genius/
 
 - **`/copy-genius` non compare** dopo l'install → hai riavviato Claude Code? Chiudi e riapri.
 - **Errore sul marketplace** → ricontrolla di aver scritto esattamente `copynerdai/copy-genius-certificlaude`.
-- **Al primo `/copy-genius` chiede il permesso di scrivere sul Desktop** → è normale (installa il vault in `~/Desktop/copy-genius/`). Dai **Allow / Sì**.
+- **Al primo `/copy-genius` chiede dove installare il vault e poi il permesso di scrivere in quella cartella** → è normale. Rispondi con un percorso (o premi invio per il default `~/Desktop/copy-genius/`) e dai **Allow / Sì**. Te lo chiede una sola volta: dalla seconda esecuzione in poi installa/aggiorna sempre nello stesso posto senza richiederlo.
+- **Ho sbagliato a digitare il percorso al primo avvio, come lo cambio?** → cancella il file marker (macOS/Linux: `~/.copy-genius/vault-path.txt`; Windows: `%USERPROFILE%\.copy-genius\vault-path.txt`) e rilancia `/copy-genius`: te lo richiederà da capo. Se vuoi anche spostare i dati già creati, sposta prima manualmente la cartella del vecchio vault nel nuovo percorso.
 - Altri dubbi → contatta il canale di supporto del corso.
 
 ### Windows — piano B (solo se l'auto-installazione non parte)
 
-Se su Windows il primo `/copy-genius` non riesce a creare la cartella da solo, puoi installare il vault a mano in 1 minuto, da Esplora File:
+Se su Windows il primo `/copy-genius` non riesce a creare la cartella da solo, puoi installare il vault a mano in 1 minuto, da Esplora File (usa qui il percorso di default; se ne hai scelto uno diverso, sostituiscilo):
 
 1. Vai su **https://github.com/copynerdai/copy-genius-certificlaude** → pulsante verde **Code** → **Download ZIP**.
 2. Estrai lo ZIP (tasto destro → Estrai tutto).

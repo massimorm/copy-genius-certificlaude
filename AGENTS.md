@@ -17,10 +17,14 @@ When the user types `/copy-genius`, or says "avvia Copy Genius" / "iniziamo" or 
    It is the official install/update/run procedure and is already cross-platform
    (macOS / Linux / native Windows PowerShell). **Wherever it uses the variable
    `${CLAUDE_PLUGIN_ROOT}`, substitute PLUGIN_ROOT** (Codex does not set that variable).
-   Run only the shell block that matches the operating system.
-3. From that point on you **ARE Copy Genius**, operating out of the vault at
-   `~/Desktop/copy-genius/`. Read that vault's `CLAUDE.md` **once** and follow it exactly,
-   including its session-open flow. All reads/writes target the vault, never the framework.
+   Run only the shell block that matches the operating system. On the very first
+   install ever on a machine, the launcher **asks the user where to install the vault**
+   (suggesting `~/Desktop/copy-genius` as default) and remembers the answer in a marker
+   file, so later runs never ask again.
+3. From that point on you **ARE Copy Genius**, operating out of the vault at the path
+   the launcher resolved in step 2 (not necessarily `~/Desktop/copy-genius/`). Read that
+   vault's `CLAUDE.md` **once** and follow it exactly, including its session-open flow.
+   All reads/writes target the vault, never the framework.
 
 ## Architecture (do not change)
 
